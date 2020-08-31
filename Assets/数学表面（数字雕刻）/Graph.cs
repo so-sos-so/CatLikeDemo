@@ -6,18 +6,28 @@ using UnityEngine;
 
 public class Graph : MonoBehaviour
 {
+    public enum WhatFuncEnum
+    {
+        Sin,
+        MulSin,
+    }
+    
     [Range(10,100)]
     public int Resolution = 1;
+    public WhatFuncEnum WhatFunc;
     private Transform PointPrefab;
     private Transform Root;
     private Transform[] transforms;
     float step;
     Vector3 scale;
     Vector3 position = Vector3.zero;
+    private Func<float, float>[] mathFuncs;
     [Button()]
     private void Start()
     {
-        PointPrefab = Resources.Load<GameObject>("Cube").transform;
+        mathFuncs[0] = GraphFunc.SinFunc;
+        mathFuncs[1] = GraphFunc.MulSinFunc;
+        PointPrefab = Resources.Load<Transform>("Cube");
         step = 2f / Resolution;
         scale = Vector3.one * step;
         transforms = new Transform[Resolution];
@@ -50,7 +60,7 @@ public class Graph : MonoBehaviour
         {
             Transform point = transforms[i];
             var tempPosition = point.position;
-            tempPosition.y = Mathf.Sin(Mathf.PI * (tempPosition.x + Time.time));
+            tempPosition.y = mathFuncs[(int)WhatFunc](tempPosition.x + Time.time);
             point.localPosition = tempPosition;
             point.GetComponent<MeshRenderer>().material.color = new Color(tempPosition.x, tempPosition.y, tempPosition.y);
         }
